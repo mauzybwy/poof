@@ -1,0 +1,82 @@
+version: "3"
+
+tasks:
+  deps:
+    run: once
+    cmds:
+      # - npm install --prefix assets
+      - mix deps.get
+
+  dev:
+    cmds:
+      - iex --name poof@127.0.0.1 --cookie poof_cookie -S mix phx.server
+    deps:
+      - task: deps
+      - task: :db:start
+      - task: migration:up
+
+  gen:migration:
+    cmd: mix ecto.gen.migration {{.CLI_ARGS}}
+
+  seed:
+    cmd: mix seed_from_storage
+
+  dashboard:
+    aliases: [dash]
+    desc: Launch the live view dashboard
+    cmd: open http://localhost:4000/admin/dashboard
+
+  web:
+    desc: Launch the live view website
+    cmd: open http://localhost:4000
+
+  admin:
+    desc: Launch the live view admin panel
+    cmd: open http://localhost:4000/admin
+
+  openapi:
+    cmd: mix openapi.spec.yaml --spec StreamlineWeb.ApiSpec --filename ../../pkgs/types/openapi_schema.yml
+
+  deploy:staging:
+    cmd: flyctl deploy --config deploy/fly/staging.toml
+
+  deploy:prod:
+    cmd: flyctl deploy --config deploy/fly/prod.toml
+
+  migration:gen:
+    cmd: mix ecto.gen.migration {{.CLI_ARGS}}
+
+  migration:up:
+    cmd: mix ecto.migrate {{.CLI_ARGS}}
+
+  migration:down:
+    cmd: mix ecto.rollback {{.CLI_ARGS}}
+
+  format:check:
+    cmd: mix format --check-formatted
+
+  format:fix:
+    cmd: mix format
+
+  compile:check:
+    cmds:
+      - mix compile --warnings-as-errors
+      - MIX_ENV=test mix compile --warnings-as-errors
+
+  compile:listen:
+    cmd: git ls-files | entr mix compile
+
+  mix:
+    cmd: mix {{.CLI_ARGS}}
+
+  test:solo:
+    cmd: mix test --only solo:true
+
+  test:fast:
+    cmd: mix test --exclude gateway:true
+
+  test:only:
+    cmd: mix test --only {{.CLI_ARGS}}
+
+  test:all:
+    cmd: mix test {{.CLI_ARGS}}

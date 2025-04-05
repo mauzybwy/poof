@@ -23,7 +23,7 @@ erl_crash.dump
 /tmp/
 
 # Ignore package tarball (built via "mix hex.build").
-streamline-*.tar
+poof-*.tar
 
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
@@ -35,8 +35,3 @@ streamline-*.tar
 npm-debug.log
 /assets/node_modules/
 
-# Local stuff
-/.cache
-/.direnv
-/.elixir_ls
-/.postgres

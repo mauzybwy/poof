@@ -1,0 +1,40 @@
+version: "3"
+
+# ------------------------------------------------------------------------------
+# Shared Task Vars
+env:
+  IEX_COOKIE: poof_cookie
+
+# ------------------------------------------------------------------------------
+# Includes
+includes:
+  # expo:
+  #   taskfile: ./apps/expo/Taskfile.yml
+  #   dir: ./apps/expo
+  phx:
+    taskfile: ./apps/phx/Taskfile.yml
+    dir: ./apps/phx
+
+# ------------------------------------------------------------------------------
+# Tasks
+tasks:
+  default:
+    silent: true
+    desc: List available tasks
+    cmd: task --list-all
+
+  connect:
+    desc: Connect to Overmind
+    cmd: overmind connect
+
+  dev:local:
+    aliases: [dev]
+    desc: Run dev processes in a local environment
+    cmds:
+      - overmind start -f Procfile.dev
+    env:
+      OVERMIND_AUTO_RESTART: expo,phoenix,phx-cmp
+
+  db:start:
+    desc: Start the Postgres database
+    cmd: sh ./scripts/postgres_start.sh

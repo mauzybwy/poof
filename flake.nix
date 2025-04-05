@@ -50,6 +50,7 @@
             elixir
             nodejs
             pkgs.go-task
+            pkgs.overmind
             pkgs.postgresql_17
             pkgs.nixpkgs-fmt
             pkgs.elixir-ls
@@ -64,7 +65,8 @@
           export PATH=${bin}:$PATH
           export MIX_HOME="$PWD/.cache/mix"
           export HEX_HOME="$PWD/.cache/hex"
-          export DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+          source ./scripts/setup_postgres.sh
 
           echo "[$PWD]"
           echo "Elixir: ${elixir}"
