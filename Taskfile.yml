@@ -33,8 +33,14 @@ tasks:
     cmds:
       - overmind start -f Procfile.dev
     env:
-      OVERMIND_AUTO_RESTART: expo,phoenix,phx-cmp
+      OVERMIND_AUTO_RESTART: expo,phx,phx-cmp
 
   db:start:
     desc: Start the Postgres database
     cmd: sh ./scripts/postgres_start.sh
+
+  db:connect:
+    desc: Connect to the Postgres database
+    deps:
+      - task: db:start
+    cmd: psql -U postgres -d poof_dev
