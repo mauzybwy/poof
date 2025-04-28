@@ -17,20 +17,20 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
     setup [:create_expiry_note]
 
     test "lists all expiry_notes", %{conn: conn, expiry_note: expiry_note} do
-      {:ok, _index_live, html} = live(conn, ~p"/expiry_notes")
+      {:ok, _index_live, html} = live(conn, ~p"/admin/expiry_notes")
 
       assert html =~ "Listing Expiry notes"
       assert html =~ expiry_note.body
     end
 
     test "saves new expiry_note", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/expiry_notes")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/expiry_notes")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Expiry note")
                |> render_click()
-               |> follow_redirect(conn, ~p"/expiry_notes/new")
+               |> follow_redirect(conn, ~p"/admin/expiry_notes/new")
 
       assert render(form_live) =~ "New Expiry note"
 
@@ -42,7 +42,7 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
                form_live
                |> form("#expiry_note-form", expiry_note: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/expiry_notes")
+               |> follow_redirect(conn, ~p"/admin/expiry_notes")
 
       html = render(index_live)
       assert html =~ "Expiry note created successfully"
@@ -50,13 +50,13 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
     end
 
     test "updates expiry_note in listing", %{conn: conn, expiry_note: expiry_note} do
-      {:ok, index_live, _html} = live(conn, ~p"/expiry_notes")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/expiry_notes")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#expiry_notes-#{expiry_note.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/expiry_notes/#{expiry_note}/edit")
+               |> follow_redirect(conn, ~p"/admin/expiry_notes/#{expiry_note}/edit")
 
       assert render(form_live) =~ "Edit Expiry note"
 
@@ -68,7 +68,7 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
                form_live
                |> form("#expiry_note-form", expiry_note: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/expiry_notes")
+               |> follow_redirect(conn, ~p"/admin/expiry_notes")
 
       html = render(index_live)
       assert html =~ "Expiry note updated successfully"
@@ -76,9 +76,12 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
     end
 
     test "deletes expiry_note in listing", %{conn: conn, expiry_note: expiry_note} do
-      {:ok, index_live, _html} = live(conn, ~p"/expiry_notes")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/expiry_notes")
 
-      assert index_live |> element("#expiry_notes-#{expiry_note.id} a", "Delete") |> render_click()
+      assert index_live
+             |> element("#expiry_notes-#{expiry_note.id} a", "Delete")
+             |> render_click()
+
       refute has_element?(index_live, "#expiry_notes-#{expiry_note.id}")
     end
   end
@@ -87,20 +90,23 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
     setup [:create_expiry_note]
 
     test "displays expiry_note", %{conn: conn, expiry_note: expiry_note} do
-      {:ok, _show_live, html} = live(conn, ~p"/expiry_notes/#{expiry_note}")
+      {:ok, _show_live, html} = live(conn, ~p"/admin/expiry_notes/#{expiry_note}")
 
       assert html =~ "Show Expiry note"
       assert html =~ expiry_note.body
     end
 
     test "updates expiry_note and returns to show", %{conn: conn, expiry_note: expiry_note} do
-      {:ok, show_live, _html} = live(conn, ~p"/expiry_notes/#{expiry_note}")
+      {:ok, show_live, _html} = live(conn, ~p"/admin/expiry_notes/#{expiry_note}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/expiry_notes/#{expiry_note}/edit?return_to=show")
+               |> follow_redirect(
+                 conn,
+                 ~p"/admin/expiry_notes/#{expiry_note}/edit?return_to=show"
+               )
 
       assert render(form_live) =~ "Edit Expiry note"
 
@@ -112,7 +118,7 @@ defmodule PoofWeb.ExpiryNoteLiveTest do
                form_live
                |> form("#expiry_note-form", expiry_note: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/expiry_notes/#{expiry_note}")
+               |> follow_redirect(conn, ~p"/admin/expiry_notes/#{expiry_note}")
 
       html = render(show_live)
       assert html =~ "Expiry note updated successfully"

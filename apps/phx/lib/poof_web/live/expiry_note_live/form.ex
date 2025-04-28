@@ -15,7 +15,7 @@ defmodule PoofWeb.ExpiryNoteLive.Form do
 
       <.form for={@form} id="expiry_note-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:body]} type="textarea" label="Body" />
-        <.input field={@form[:expiration]} type="text" label="Expiration" />
+        <.input field={@form[:expiration]} type="datetime-local" label="Expiration" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Expiry note</.button>
           <.button navigate={return_path(@return_to, @expiry_note)}>Cancel</.button>
@@ -90,6 +90,6 @@ defmodule PoofWeb.ExpiryNoteLive.Form do
     end
   end
 
-  defp return_path("index", _expiry_note), do: ~p"/expiry_notes"
-  defp return_path("show", expiry_note), do: ~p"/expiry_notes/#{expiry_note}"
+  defp return_path("index", _expiry_note), do: ~p"/admin/expiry_notes"
+  defp return_path("show", expiry_note), do: ~p"/admin/expiry_notes/#{expiry_note}"
 end

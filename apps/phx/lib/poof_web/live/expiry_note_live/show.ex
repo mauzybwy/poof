@@ -11,10 +11,10 @@ defmodule PoofWeb.ExpiryNoteLive.Show do
         Expiry note {@expiry_note.id}
         <:subtitle>This is a expiry_note record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/expiry_notes"}>
+          <.button navigate={~p"/admin/expiry_notes"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/expiry_notes/#{@expiry_note}/edit?return_to=show"}>
+          <.button variant="primary" navigate={~p"/admin/expiry_notes/#{@expiry_note}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> Edit expiry_note
           </.button>
         </:actions>

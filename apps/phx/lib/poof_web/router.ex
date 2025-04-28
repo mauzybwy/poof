@@ -19,10 +19,12 @@ defmodule PoofWeb.Router do
 
     get "/", PageController, :home
 
-    live "/expiry_notes", ExpiryNoteLive.Index, :index
-    live "/expiry_notes/new", ExpiryNoteLive.Form, :new
-    live "/expiry_notes/:id", ExpiryNoteLive.Show, :show
-    live "/expiry_notes/:id/edit", ExpiryNoteLive.Form, :edit
+    scope "/admin" do
+      live "/expiry_notes", ExpiryNoteLive.Index, :index
+      live "/expiry_notes/new", ExpiryNoteLive.Form, :new
+      live "/expiry_notes/:id", ExpiryNoteLive.Show, :show
+      live "/expiry_notes/:id/edit", ExpiryNoteLive.Form, :edit
+    end
   end
 
   # Other scopes may use custom stacks.
