@@ -18,6 +18,11 @@ defmodule PoofWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live "/expiry_notes", ExpiryNoteLive.Index, :index
+    live "/expiry_notes/new", ExpiryNoteLive.Form, :new
+    live "/expiry_notes/:id", ExpiryNoteLive.Show, :show
+    live "/expiry_notes/:id/edit", ExpiryNoteLive.Form, :edit
   end
 
   # Other scopes may use custom stacks.
