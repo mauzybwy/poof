@@ -156,12 +156,19 @@ defmodule PoofWeb.CoreComponents do
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
 
+  attr :ignore_errors, :boolean,
+    default: false,
+    doc: "if true, ignores errors for this input"
+
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
-    errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
+    ignore_errors = Map.get(assigns, :ignore_errors, false)
+
+    errors =
+      if(not ignore_errors and Phoenix.Component.used_input?(field), do: field.errors, else: [])
 
     assigns
     |> assign(field: nil, id: assigns.id || field.id)
@@ -239,7 +246,7 @@ defmodule PoofWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <fieldset class="fieldset mb-2">
+    <fieldset class="fieldset">
       <label>
         <span :if={@label} class="fieldset-label mb-1">{@label}</span>
         <input
