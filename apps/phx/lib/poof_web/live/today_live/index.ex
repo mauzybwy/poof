@@ -4,69 +4,6 @@ defmodule PoofWeb.TodayLive.Index do
   alias Poof.ExpiryNotes
 
   # ----------------------------------------------------------------------------
-  # Render
-  # ----------------------------------------------------------------------------
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash}>
-      <.header>
-        Today
-      </.header>
-
-      <div class="flex items-center gap-2">
-        <.form
-          for={@form}
-          id="expiry_note-form"
-          phx-change="validate"
-          phx-submit="save"
-          class="flex flex-1 items-center gap-2"
-        >
-          <div class="flex-1">
-            <.input
-              placeholder="What do you want to remember? It will disappear in 24 hours :)"
-              field={@form[:body]}
-              value=""
-              ignore_errors={true}
-            />
-          </div>
-          <.button variant={
-            case @form[:body].value do
-              nil -> nil
-              "" -> nil
-              _ -> "primary"
-            end
-          }>
-            Submit
-          </.button>
-        </.form>
-      </div>
-
-      <.table
-        id="expiry_notes"
-        rows={@streams.expiry_notes}
-        row_click={fn {_id, expiry_note} -> JS.navigate(~p"/admin/expiry_notes/#{expiry_note}") end}
-      >
-        <:col :let={{_id, expiry_note}} label="Note">{expiry_note.body}</:col>
-        <:col :let={{_id, expiry_note}} label="Expires">{expiry_note.expiration}</:col>
-        <:action :let={{_id, expiry_note}}>
-          <div class="sr-only">
-            <.link navigate={~p"/admin/expiry_notes/#{expiry_note}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/admin/expiry_notes/#{expiry_note}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, expiry_note}}>
-          <.link phx-click={JS.push("delete", value: %{id: expiry_note.id}) |> hide("##{id}")}>
-            Delete
-          </.link>
-        </:action>
-      </.table>
-    </Layouts.app>
-    """
-  end
-
-  # ----------------------------------------------------------------------------
   # Mount
   # ----------------------------------------------------------------------------
 
@@ -112,7 +49,12 @@ defmodule PoofWeb.TodayLive.Index do
   # ----------------------------------------------------------------------------
 
   defp create_expiry_note(socket, expiry_note_params) do
-    expiry_note_params = Map.put(expiry_note_params, "expiration", DateTime.utc_now())
+    expiry_note_params =
+      Map.put(
+        expiry_note_params,
+        "expiration",
+        DateTime.utc_now() |> DateTime.add(24 * 60 * 60, :second)
+      )
 
     case ExpiryNotes.create_expiry_note(expiry_note_params) do
       {:ok, expiry_note} ->
@@ -125,5 +67,77 @@ defmodule PoofWeb.TodayLive.Index do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  def calc_time_string(expiry_note) do
+    Timex.diff(expiry_note.expiration, Timex.now(), :duration)
+    |> Timex.format_duration(:humanized)
+  end
+
+  # ----------------------------------------------------------------------------
+  # Render
+  # ----------------------------------------------------------------------------
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash}>
+      <.header>
+        Today
+      </.header>
+
+      <div class="flex items-center gap-2">
+        <.form
+          for={@form}
+          id="expiry_note-form"
+          phx-change="validate"
+          phx-submit="save"
+          class="flex flex-1 items-center gap-2"
+        >
+          <div class="flex-1">
+            <.input
+              placeholder="What do you want to remember? It will disappear in 24 hours :)"
+              field={@form[:body]}
+              value=""
+              ignore_errors={true}
+            />
+          </div>
+          <.button variant={
+            case @form[:body].value do
+              nil -> nil
+              "" -> nil
+              _ -> "primary"
+            end
+          }>
+            Submit
+          </.button>
+        </.form>
+      </div>
+
+      <.table
+        id="expiry_notes"
+        rows={@streams.expiry_notes}
+        row_click={fn {_id, expiry_note} -> JS.navigate(~p"/admin/expiry_notes/#{expiry_note}") end}
+      >
+        <:col :let={{_id, expiry_note}} label="Note">{expiry_note.body}</:col>
+        <:col :let={{_id, expiry_note}} label="Expires">
+          {calc_time_string(expiry_note)}
+        </:col>
+        <:action :let={{_id, expiry_note}}>
+          <div class="sr-only">
+            <.link navigate={~p"/admin/expiry_notes/#{expiry_note}"}>Show</.link>
+          </div>
+          <.link navigate={~p"/admin/expiry_notes/#{expiry_note}/edit"}>
+            <.icon name="hero-pencil-square" class="h-4 w-4" />
+          </.link>
+        </:action>
+        <:action :let={{id, expiry_note}}>
+          <.link phx-click={JS.push("delete", value: %{id: expiry_note.id}) |> hide("##{id}")}>
+            <.icon name="hero-trash" class="h-4 w-4" />
+          </.link>
+        </:action>
+      </.table>
+    </Layouts.app>
+    """
   end
 end
