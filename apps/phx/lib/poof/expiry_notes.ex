@@ -17,8 +17,11 @@ defmodule Poof.ExpiryNotes do
       [%ExpiryNote{}, ...]
 
   """
-  def list_expiry_notes do
-    Repo.all(ExpiryNote)
+  def list_expiry_notes(opts \\ []) do
+    from(e in ExpiryNote,
+      order_by: ^Keyword.get(opts, :order_by, asc: :expiration)
+    )
+    |> Repo.all()
   end
 
   @doc """

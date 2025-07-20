@@ -24,6 +24,7 @@ defmodule PoofWeb.Layouts do
       <div class="flex-none badge badge-warning badge-sm ml-3">
         <p class="font-bold">:)</p>
       </div>
+      <!-- .theme_toggle / -->
     </header>
 
     <main class="px-4 py-20 sm:px-6 lg:px-8">

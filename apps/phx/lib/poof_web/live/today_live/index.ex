@@ -13,7 +13,8 @@ defmodule PoofWeb.TodayLive.Index do
      socket
      |> assign(:page_title, "Listing Expiry notes")
      |> assign(:form, to_form(ExpiryNotes.change_expiry_note(%ExpiryNotes.ExpiryNote{})))
-     |> stream(:expiry_notes, ExpiryNotes.list_expiry_notes())}
+     |> stream(:expiry_notes, ExpiryNotes.list_expiry_notes())
+     |> stream(:new_expiry_notes, [])}
   end
 
   # ----------------------------------------------------------------------------
@@ -25,7 +26,10 @@ defmodule PoofWeb.TodayLive.Index do
     expiry_note = ExpiryNotes.get_expiry_note!(id)
     {:ok, _} = ExpiryNotes.delete_expiry_note(expiry_note)
 
-    {:noreply, stream_delete(socket, :expiry_notes, expiry_note)}
+    {:noreply,
+     socket
+     |> stream_delete(:expiry_notes, expiry_note)
+     |> stream_delete(:new_expiry_notes, expiry_note)}
   end
 
   # ----------------------------------------------------------------------------
@@ -40,7 +44,7 @@ defmodule PoofWeb.TodayLive.Index do
 
   # ----------------------------------------------------------------------------
 
-  def handle_event("save", %{"expiry_note" => expiry_note_params}, socket) do
+  def handle_event("submit", %{"expiry_note" => expiry_note_params}, socket) do
     create_expiry_note(socket, expiry_note_params)
   end
 
@@ -60,18 +64,13 @@ defmodule PoofWeb.TodayLive.Index do
       {:ok, expiry_note} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Poof!")
+         |> put_flash(:info, "Note created successfully.")
          |> assign(:form, to_form(ExpiryNotes.change_expiry_note(%ExpiryNotes.ExpiryNote{})))
-         |> stream_insert(:expiry_notes, expiry_note)}
+         |> stream_insert(:new_expiry_notes, expiry_note, at: 0)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
-  end
-
-  def calc_time_string(expiry_note) do
-    Timex.diff(expiry_note.expiration, Timex.now(), :duration)
-    |> Timex.format_duration(:humanized)
   end
 
   # ----------------------------------------------------------------------------
@@ -91,7 +90,7 @@ defmodule PoofWeb.TodayLive.Index do
           for={@form}
           id="expiry_note-form"
           phx-change="validate"
-          phx-submit="save"
+          phx-submit="submit"
           class="flex flex-1 items-center gap-2"
         >
           <div class="flex-1">
@@ -114,29 +113,22 @@ defmodule PoofWeb.TodayLive.Index do
         </.form>
       </div>
 
-      <.table
-        id="expiry_notes"
-        rows={@streams.expiry_notes}
-        row_click={fn {_id, expiry_note} -> JS.navigate(~p"/admin/expiry_notes/#{expiry_note}") end}
-      >
-        <:col :let={{_id, expiry_note}} label="Note">{expiry_note.body}</:col>
-        <:col :let={{_id, expiry_note}} label="Expires">
-          {calc_time_string(expiry_note)}
-        </:col>
-        <:action :let={{_id, expiry_note}}>
-          <div class="sr-only">
-            <.link navigate={~p"/admin/expiry_notes/#{expiry_note}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/admin/expiry_notes/#{expiry_note}/edit"}>
-            <.icon name="hero-pencil-square" class="h-4 w-4" />
-          </.link>
-        </:action>
-        <:action :let={{id, expiry_note}}>
-          <.link phx-click={JS.push("delete", value: %{id: expiry_note.id}) |> hide("##{id}")}>
-            <.icon name="hero-trash" class="h-4 w-4" />
-          </.link>
-        </:action>
-      </.table>
+      <div class="flex flex-col gap-2" id="new_expiry_notes_cards" phx-update="stream">
+        <Ecosystems.ExpiryNotes.card
+          :for={{dom_id, expiry_note} <- @streams.new_expiry_notes}
+          id={"new_expiry_notes_card-#{dom_id}"}
+          expiry_note={expiry_note}
+          class="border-secondary"
+        />
+      </div>
+
+      <div class="flex flex-col gap-2" id="expiry_notes_cards" phx-update="stream">
+        <Ecosystems.ExpiryNotes.card
+          :for={{dom_id, expiry_note} <- @streams.expiry_notes}
+          id={"expiry_notes_card-#{dom_id}"}
+          expiry_note={expiry_note}
+        />
+      </div>
     </Layouts.app>
     """
   end

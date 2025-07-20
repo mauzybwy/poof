@@ -91,6 +91,9 @@ defmodule PoofWeb do
       alias Phoenix.LiveView.JS
       alias PoofWeb.Layouts
 
+      # Import convenience functions for rendering templates
+      alias PoofWeb.Ecosystems
+
       # Routes generation with the ~p sigil
       unquote(verified_routes())
     end
