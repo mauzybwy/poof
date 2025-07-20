@@ -1,5 +1,5 @@
 defmodule PoofWeb.Ecosystems.ExpiryNotes do
-  use PoofWeb, :live_component
+  use PoofWeb, :dead_component
   alias Poof.ExpiryNotes.ExpiryNote
 
   @doc """
@@ -7,6 +7,7 @@ defmodule PoofWeb.Ecosystems.ExpiryNotes do
   """
   attr :id, :string, required: true
   attr :expiry_note, ExpiryNote, required: true
+  attr :on_edit, :string, default: nil
 
   attr :class, :string, default: nil
 
@@ -46,7 +47,7 @@ defmodule PoofWeb.Ecosystems.ExpiryNotes do
               class="dropdown-content menu bg-base-100 rounded-box z-1 w-24 p-2 shadow-sm"
             >
               <li>
-                <.link navigate={~p"/admin/expiry_notes/#{@expiry_note}/edit"}>
+                <.link navigate={~p"/today/note/#{@expiry_note}/edit"}>
                   <.icon name="hero-pencil-square" class="h-4 w-4" /> Edit
                 </.link>
               </li>

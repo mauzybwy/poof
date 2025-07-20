@@ -20,6 +20,7 @@ defmodule PoofWeb.Router do
     get "/", PageController, :home
 
     live "/today", TodayLive.Index, :index
+    live "/today/note/:id/edit", TodayLive.Index, :edit
 
     scope "/admin" do
       live "/expiry_notes", ExpiryNoteLive.Index, :index

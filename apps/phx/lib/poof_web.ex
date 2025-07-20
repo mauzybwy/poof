@@ -64,6 +64,14 @@ defmodule PoofWeb do
     end
   end
 
+  def dead_component do
+    quote do
+      use Phoenix.Component
+
+      unquote(html_helpers())
+    end
+  end
+
   def html do
     quote do
       use Phoenix.Component

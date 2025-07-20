@@ -2,6 +2,7 @@ defmodule PoofWeb.TodayLive.Index do
   use PoofWeb, :live_view
 
   alias Poof.ExpiryNotes
+  alias PoofWeb.TodayLive.EditNoteComponent
 
   # ----------------------------------------------------------------------------
   # Mount
@@ -11,10 +12,28 @@ defmodule PoofWeb.TodayLive.Index do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Listing Expiry notes")
      |> assign(:form, to_form(ExpiryNotes.change_expiry_note(%ExpiryNotes.ExpiryNote{})))
      |> stream(:expiry_notes, ExpiryNotes.list_expiry_notes())
      |> stream(:new_expiry_notes, [])}
+  end
+
+  # ----------------------------------------------------------------------------
+  # Params
+  # ----------------------------------------------------------------------------
+
+  @impl true
+  def handle_params(params, _url, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    socket
+    |> assign(:expiry_note, ExpiryNotes.get_expiry_note!(id))
+  end
+
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:expiry_note, nil)
   end
 
   # ----------------------------------------------------------------------------
@@ -46,6 +65,29 @@ defmodule PoofWeb.TodayLive.Index do
 
   def handle_event("submit", %{"expiry_note" => expiry_note_params}, socket) do
     create_expiry_note(socket, expiry_note_params)
+  end
+
+  # ----------------------------------------------------------------------------
+  # Handle Info Callbacks
+  # ----------------------------------------------------------------------------
+
+  @impl true
+  def handle_info(
+        {PoofWeb.TodayLive.EditNoteComponent, {:saved, expiry_note}},
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> stream_insert(:expiry_notes, expiry_note)}
+  end
+
+  # ----------------------------------------------------------------------------
+  # JS Helper Functions
+  # ----------------------------------------------------------------------------
+
+  def hide_modal(js \\ %JS{}) do
+    js
+    |> JS.patch(~p"/today")
   end
 
   # ----------------------------------------------------------------------------
@@ -81,10 +123,6 @@ defmodule PoofWeb.TodayLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <.header>
-        Today
-      </.header>
-
       <div class="flex items-center gap-2">
         <.form
           for={@form}
@@ -130,6 +168,26 @@ defmodule PoofWeb.TodayLive.Index do
         />
       </div>
     </Layouts.app>
+
+    <dialog
+      :if={@live_action in [:edit]}
+      id="modal_expiry_note_edit"
+      class="modal modal-open"
+      phx-window-keydown={hide_modal()}
+      phx-key="Escape"
+    >
+      <div class="modal-box">
+        <.live_component
+          module={EditNoteComponent}
+          id="modal_expiry_note_edit__live"
+          expiry_note={@expiry_note}
+        />
+      </div>
+
+      <form method="dialog" class="modal-backdrop">
+        <button phx-click={hide_modal()}>close</button>
+      </form>
+    </dialog>
     """
   end
 end
