@@ -37,11 +37,8 @@ tasks:
   openapi:
     cmd: mix openapi.spec.yaml --spec StreamlineWeb.ApiSpec --filename ../../pkgs/types/openapi_schema.yml
 
-  deploy:staging:
-    cmd: flyctl deploy --config deploy/fly/staging.toml
-
-  deploy:prod:
-    cmd: flyctl deploy --config deploy/fly/prod.toml
+  deploy:
+    cmd: flyctl deploy --config deploy/fly.toml
 
   migration:gen:
     cmd: mix ecto.gen.migration {{.CLI_ARGS}}
