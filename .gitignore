@@ -35,3 +35,6 @@ poof-*.tar
 npm-debug.log
 /assets/node_modules/
 
+.postgres/
+.direnv/
+.cache/

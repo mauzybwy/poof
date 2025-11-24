@@ -1,0 +1,74 @@
+version: "3"
+
+# ------------------------------------------------------------------------------
+# Shared Task Vars
+env:
+  IEX_COOKIE: poof_cookie
+
+# ------------------------------------------------------------------------------
+# Includes
+includes:
+
+# ------------------------------------------------------------------------------
+# Tasks
+tasks:
+  default:
+    silent: true
+    desc: List available tasks
+    cmd: task --list-all
+
+  # General Dev Tasks
+  dev:local:
+    aliases: [dev]
+    desc: Run dev processes in a local environment
+    cmds:
+      - task: phx:dev
+    deps:
+      - task: db:start
+      - task: db:migrate
+
+  # Phoenix Tasks
+  phx:deps:
+    cmd: mix deps.get
+
+  phx:dev:
+    cmd: iex --name poof@127.0.0.1 --cookie $IEX_COOKIE -S mix phx.server
+    deps:
+      - task: phx:deps
+  
+  # Database Tasks
+  db:migrate:
+    cmd: mix ecto.migrate
+
+  db:rollback:
+    cmd: mix ecto.rollback
+
+  db:start:
+    desc: Start the Postgres database
+    cmd: sh ./scripts/postgres_start.sh
+
+  db:stop:
+    desc: Stop the Postgres database
+    cmd: sh ./scripts/postgres_stop.sh
+
+  db:restart:
+    desc: Re-start the Postgres database
+    cmds:
+      - sh ./scripts/postgres_stop.sh
+      - sh ./scripts/postgres_start.sh
+
+  db:connect:
+    desc: Connect to the Postgres database
+    deps:
+      - task: db:start
+    cmd: psql -U postgres -d poof_dev
+
+  # Livebook
+  book:start:
+    desc: Start LiveBook
+    cmd: livebook start
+    env:
+      LIVEBOOK_TOKEN_ENABLED: false
+      LIVEBOOK_PORT: 6969
+      LIVEBOOK_IFRAME_PORT: 6981
+      LIVEBOOK_DEFAULT_RUNTIME: attached:streamline@127.0.0.1:$IEX_COOKIE
