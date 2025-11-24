@@ -62,6 +62,12 @@ defmodule PoofWeb.UserLive.Settings do
           Save Password
         </.button>
       </.form>
+
+      <div class="divider" />
+      
+      <.link href={~p"/users/log-out"} method="delete" class="btn btn-soft">
+        Log out
+      </.link>
     </Layouts.app>
     """
   end

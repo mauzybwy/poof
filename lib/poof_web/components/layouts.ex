@@ -39,24 +39,26 @@ defmodule PoofWeb.Layouts do
       <div class="flex-1">
         <a href="/" class="flex-1 flex w-fit items-center gap-2">
           <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
+          <span class="text-sm font-semibold">Poof</span>
         </a>
       </div>
       <div class="flex-none">
         <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
+          <li :if={@current_scope}>
+            <.link href={~p"/users/settings"} class="btn btn-ghost">
+              {@current_scope.user.email}
+            </.link>
           </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
+
+          <li :if={!@current_scope}>
+            <.link href={~p"/users/log-in"} class="btn btn-ghost">
+              Log in
+            </.link>
           </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
+          <li :if={!@current_scope}>
+            <.link href={~p"/users/register"} class="btn btn-primary">
+              Register
+            </.link>
           </li>
         </ul>
       </div>

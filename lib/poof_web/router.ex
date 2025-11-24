@@ -17,12 +17,6 @@ defmodule PoofWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", PoofWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", PoofWeb do
   #   pipe_through :api
@@ -64,6 +58,7 @@ defmodule PoofWeb.Router do
 
     live_session :current_user,
       on_mount: [{PoofWeb.UserAuth, :mount_current_scope}] do
+      live "/", HomeLive
       live "/users/register", UserLive.Registration, :new
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
