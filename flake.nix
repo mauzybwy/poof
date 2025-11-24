@@ -1,5 +1,5 @@
 {
-  description = "Developer environment shell for streamline";
+  description = "Developer environment shell for poof";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
