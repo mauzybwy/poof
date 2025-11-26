@@ -14,7 +14,7 @@ ENV PATH="/root/.local/bin:$PATH"
 WORKDIR /app
 
 # Copy mise config and install tools
-COPY .mise.toml ./
+COPY mise.toml ./
 RUN mise trust && mise install
 
 # Activate mise for subsequent commands
