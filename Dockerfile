@@ -31,6 +31,7 @@ RUN mix deps.get --only $MIX_ENV
 
 RUN mkdir config
 COPY config/config.exs config/${MIX_ENV}.exs config/
+RUN env
 RUN mix deps.compile
 
 # Build assets
