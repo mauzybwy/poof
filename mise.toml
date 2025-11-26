@@ -2,7 +2,6 @@
 erlang = "28.2"
 elixir = "1.19.3"
 node = "24"
-livebook = "0.16.2"
 
 [env]
 MIX_ENV = "dev"
