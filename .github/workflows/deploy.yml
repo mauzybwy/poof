@@ -40,5 +40,5 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /opt/apps
-            docker compose pull ${{ env.IMAGE_NAME }}
-            docker compose up -d ${{ env.IMAGE_NAME }}
+            docker compose pull poof
+            docker compose up -d poof
