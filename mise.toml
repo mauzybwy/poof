@@ -5,12 +5,6 @@ node = "24"
 
 [env]
 MIX_ENV = "dev"
-DATABASE_URL = "postgres://postgres:postgres@localhost:5432/poof_dev"
-IEX_COOKIE = "poof_cookie"
-LIVEBOOK_TOKEN_ENABLED = false
-LIVEBOOK_PORT = 6969
-LIVEBOOK_IFRAME_PORT = 6981
-LIVEBOOK_DEFAULT_RUNTIME = "attached:streamline@127.0.0.1:$IEX_COOKIE"
 MIX_HOME = "{{config_root}}/.mix"
 HEX_HOME = "{{config_root}}/.hex"
 _.path = "{{env.MIX_HOME}}/escripts"
