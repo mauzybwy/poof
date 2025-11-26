@@ -34,16 +34,16 @@ COPY config/config.exs config/${MIX_ENV}.exs config/
 RUN env
 RUN mix deps.compile
 
-# Build assets
-COPY assets assets
-COPY priv priv
-RUN mix assets.deploy
-
 # Compile and build release
 COPY lib lib
 RUN mix compile
 COPY config/runtime.exs config/
 RUN mix release
+
+# Build assets
+COPY assets assets
+COPY priv priv
+RUN mix assets.deploy
 
 # Runtime stage - no mise needed, just the release
 FROM debian:bookworm-slim AS runtime
