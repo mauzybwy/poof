@@ -29,23 +29,23 @@ ENV MIX_ENV=prod
 COPY mix.exs mix.lock ./
 RUN mix deps.get --only $MIX_ENV
 
-RUN mkdir config
-COPY config/config.exs config/${MIX_ENV}.exs config/
-RUN env
+COPY config/config.exs config/prod.exs config/
 RUN mix deps.compile
 
-# Compile and build release
+# Compile application code
 COPY lib lib
+COPY priv priv
 RUN mix compile
+
+# Build assets (needs compiled code for tailwind to scan templates)
+COPY assets assets
+RUN mix assets.deploy
+
+# Build release
 COPY config/runtime.exs config/
 RUN mix release
 
-# Build assets
-COPY assets assets
-COPY priv priv
-RUN mix assets.deploy
-
-# Runtime stage - no mise needed, just the release
+# Runtime stage
 FROM debian:bookworm-slim AS runtime
 
 RUN apt-get update -y && \
