@@ -37,7 +37,6 @@ RUN mix deps.compile
 # Build assets
 COPY assets assets
 COPY priv priv
-RUN npm ci --prefix assets
 RUN mix assets.deploy
 
 # Compile and build release
