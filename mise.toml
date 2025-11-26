@@ -53,3 +53,9 @@ description = "Clean project"
 run = """
 rm -rf _build deps
 """
+
+[tasks.iex-prod]
+description = "Connect to prod IEX"
+run="""
+ssh -t -i $VPS_SSH_PUB_KEY deploy@$VPS_HOST 'docker compose --project-directory "/opt/apps" exec -it poof /app/bin/poof remote'
+"""
