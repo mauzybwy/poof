@@ -1,0 +1,63 @@
+[tools]
+erlang = "28.2"
+elixir = "1.19.3"
+node = "24"
+livebook = "0.16.2"
+
+[env]
+MIX_ENV = "dev"
+DATABASE_URL = "postgres://postgres:postgres@localhost:5432/poof_dev"
+IEX_COOKIE = "poof_cookie"
+LIVEBOOK_TOKEN_ENABLED = false
+LIVEBOOK_PORT = 6969
+LIVEBOOK_IFRAME_PORT = 6981
+LIVEBOOK_DEFAULT_RUNTIME = "attached:streamline@127.0.0.1:$IEX_COOKIE"
+MIX_HOME = "{{config_root}}/.mix"
+HEX_HOME = "{{config_root}}/.hex"
+_.path = "{{env.MIX_HOME}}/escripts"
+
+[tasks.setup]
+description = "Setup from scratch"
+run = """
+mix escript.install hex livebook
+"""
+
+[tasks.db]
+description = "Start dev database"
+run = "docker compose -f docker-compose.dev.yml up -d"
+
+[tasks.db-stop]
+description = "Stop dev database"
+run = "docker compose -f docker-compose.dev.yml down"
+
+[tasks.db-reset]
+description = "Reset dev database"
+run = """
+mix ecto.drop
+mix ecto.create
+mix ecto.migrate
+mix run priv/repo/seeds.exs
+"""
+
+[tasks.dev]
+description = "Start dev server with database"
+depends = ["db"]
+run = """
+mix deps.get
+mix ecto.migrate
+iex --name poof@127.0.0.1 --cookie $IEX_COOKIE -S mix phx.server
+"""
+
+[tasks.test]
+description = "Run tests"
+run = "mix test"
+
+[tasks.book]
+description = "Start Livebook"
+run = "livebook start"
+
+[tasks.clean]
+description = "Clean project"
+run = """
+rm -rf _build deps
+"""

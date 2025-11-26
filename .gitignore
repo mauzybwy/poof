@@ -38,3 +38,5 @@ npm-debug.log
 .postgres/
 .direnv/
 .cache/
+.mix/
+.hex/
