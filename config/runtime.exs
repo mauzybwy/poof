@@ -103,6 +103,7 @@ if config_env() == :prod do
   # Check `Plug.SSL` for all available options in `force_ssl`.
 
   # ## Configuring the mailer
+  config :poof, Poof.Mailer, adapter: Swoosh.Adapters.Logger
   #
   # In production you need to configure the mailer to use a different adapter.
   # Here is an example configuration for Mailgun:
