@@ -54,8 +54,20 @@ run = """
 rm -rf _build deps
 """
 
-[tasks.iex-prod]
+[tasks."prod:ssh"]
+description = "Connect to prod ssh"
+run="""
+ssh -t -i $VPS_SSH_PUB_KEY deploy@$VPS_HOST
+"""
+
+[tasks."prod:iex"]
 description = "Connect to prod IEX"
 run="""
-ssh -t -i $VPS_SSH_PUB_KEY deploy@$VPS_HOST 'docker compose --project-directory "/opt/apps" exec -it poof /app/bin/poof remote'
+mise prod:ssh 'docker compose --project-directory "/opt/apps" exec -it poof /app/bin/poof remote'
+"""
+
+[tasks."prod:logs"]
+description = "Watch prod logs"
+run="""
+mise prod:ssh 'docker compose --project-directory "/opt/apps" logs -f poof'
 """
