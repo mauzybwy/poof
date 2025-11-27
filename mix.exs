@@ -67,7 +67,8 @@ defmodule Poof.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:tzdata, "~> 1.1"}
+      {:tzdata, "~> 1.1"},
+      {:timex, "~> 3.7"}
     ]
   end
 

@@ -41,7 +41,8 @@ defmodule Poof.ExpiryNotes do
 
   """
   def list_expiry_notes(%Scope{} = scope) do
-    Repo.all_by(ExpiryNote, user_id: scope.user.id)
+    from(ExpiryNote, where: [user_id: ^scope.user.id], order_by: [asc: :expiration])
+    |> Repo.all()
   end
 
   @doc """
