@@ -26,6 +26,7 @@ import { hooks as colocatedHooks } from "phoenix-colocated/poof";
 import topbar from "../vendor/topbar";
 import { LocalTimeHook } from "./hooks/LocalTimeHook";
 import { LocalTimezoneHook } from "./hooks/LocalTimezoneHook";
+import { LocalDateTimeInputHook } from "./hooks/LocalDateTimeInputHook";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -37,6 +38,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
   hooks: {
     LocalTime: LocalTimeHook(),
     LocalTimezone: LocalTimezoneHook(),
+    LocalDateTimeInput: LocalDateTimeInputHook(),
     ...colocatedHooks,
   },
 });

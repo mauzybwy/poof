@@ -16,10 +16,14 @@ defmodule PoofWeb.ExpiryNoteLive.Form do
       </.header>
 
       <.form for={@form} id="expiry_note-form" phx-change="validate" phx-submit="save">
-        <input id="timezone" type="hidden" phx-hook="LocalTimezone" name="timezone" />
-        
         <.input field={@form[:body]} type="textarea" label="Body" />
-        <.input field={@form[:expiration]} type="datetime-local" label="Expiration" />
+        <.input
+          field={@form[:expiration]}
+          type="datetime-local"
+          label="Expiration"
+          phx-hook="LocalDateTimeInput"
+          data-utc={@expiry_note.expiration && DateTime.to_iso8601(@expiry_note.expiration)}
+        />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Expiry note</.button>
           <.button navigate={return_path(@current_scope, @return_to, @expiry_note)}>Cancel</.button>
@@ -46,7 +50,10 @@ defmodule PoofWeb.ExpiryNoteLive.Form do
     socket
     |> assign(:page_title, "Edit Expiry note")
     |> assign(:expiry_note, expiry_note)
-    |> assign(:form, to_form(ExpiryNotes.change_expiry_note(socket.assigns.current_scope, expiry_note)))
+    |> assign(
+      :form,
+      to_form(ExpiryNotes.change_expiry_note(socket.assigns.current_scope, expiry_note))
+    )
   end
 
   defp apply_action(socket, :new, _params) do
@@ -55,36 +62,44 @@ defmodule PoofWeb.ExpiryNoteLive.Form do
     socket
     |> assign(:page_title, "New Expiry note")
     |> assign(:expiry_note, expiry_note)
-    |> assign(:form, to_form(ExpiryNotes.change_expiry_note(socket.assigns.current_scope, expiry_note)))
+    |> assign(
+      :form,
+      to_form(ExpiryNotes.change_expiry_note(socket.assigns.current_scope, expiry_note))
+    )
+  end
+
+  @impl true
+  def handle_event("datetime_changed", %{"utc" => utc_string}, socket) do
+    {:ok, datetime, _} = DateTime.from_iso8601(utc_string)
+    {:noreply, assign(socket, :expiration_utc, datetime)}
   end
 
   @impl true
   def handle_event("validate", %{"expiry_note" => expiry_note_params}, socket) do
-    changeset = ExpiryNotes.change_expiry_note(socket.assigns.current_scope, socket.assigns.expiry_note, expiry_note_params)
-    
+    changeset =
+      ExpiryNotes.change_expiry_note(
+        socket.assigns.current_scope,
+        socket.assigns.expiry_note,
+        expiry_note_params
+      )
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
-  def handle_event("save", %{"expiry_note" => expiry_note_params, "timezone" => timezone}, socket) do
-    expiration = expiry_note_params["expiration"] <> ":00"
-
-    with {:ok, naive} <- NaiveDateTime.from_iso8601(expiration),
-         {:ok, datetime} <- DateTime.from_naive(naive, timezone) do
-      
-      save_expiry_note(
-        socket,
-        socket.assigns.live_action,
-        Map.replace(expiry_note_params, "expiration", datetime)
-      )
-    else
-      other ->
-        Logger.error(inspect(other))
-        {:noreply, put_flash(socket, :error, "Could not calculate datetime")}
-    end
+  def handle_event("save", %{"expiry_note" => expiry_note_params}, socket) do
+    save_expiry_note(
+      socket,
+      socket.assigns.live_action,
+      Map.replace(expiry_note_params, "expiration", socket.assigns.expiration_utc)
+    )
   end
 
   defp save_expiry_note(socket, :edit, expiry_note_params) do
-    case ExpiryNotes.update_expiry_note(socket.assigns.current_scope, socket.assigns.expiry_note, expiry_note_params) do
+    case ExpiryNotes.update_expiry_note(
+           socket.assigns.current_scope,
+           socket.assigns.expiry_note,
+           expiry_note_params
+         ) do
       {:ok, expiry_note} ->
         {:noreply,
          socket
