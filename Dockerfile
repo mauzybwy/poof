@@ -43,6 +43,7 @@ RUN mix assets.deploy
 
 # Build release
 COPY config/runtime.exs config/
+COPY rel rel
 RUN mix release
 
 # Runtime stage
