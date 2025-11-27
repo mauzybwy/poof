@@ -1,7 +1,7 @@
 defmodule PoofWeb.UserLive.Settings do
   use PoofWeb, :live_view
 
-  on_mount {PoofWeb.UserAuth, :require_sudo_mode}
+  # on_mount {PoofWeb.UserAuth, :require_sudo_mode}
 
   alias Poof.Accounts
 
@@ -64,7 +64,7 @@ defmodule PoofWeb.UserLive.Settings do
       </.form>
 
       <div class="divider" />
-      
+
       <.link href={~p"/users/log-out"} method="delete" class="btn btn-soft">
         Log out
       </.link>
