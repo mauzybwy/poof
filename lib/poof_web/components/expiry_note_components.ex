@@ -9,13 +9,17 @@ defmodule PoofWeb.ExpiryNoteComponents do
 
   attr :id, :string
   attr :expiry_note, ExpiryNote
-  attr :editing?, :boolean
+  attr :editing?, :boolean, default: false
+  attr :fresh?, :boolean, default: false
 
   def expiry_note(%{editing?: true} = assigns) do
     ~H"""
     <div
       id={@id}
-      class="card border-base-200 border-2 rounded-md shadow-xl"
+      class={[
+        "card border-2 rounded-md shadow-xl",
+        if(@fresh?, do: "border-primary", else: "border-base-200")
+      ]}
     >
       <form
         id="expiry_note-form"
@@ -24,7 +28,7 @@ defmodule PoofWeb.ExpiryNoteComponents do
         phx-hook="CtrlEnterSubmit"
       >
         <.input
-          id="#{id}-textarea"
+          id="#{id}-edit-input"
           type="textarea"
           name="body"
           value={@expiry_note.body}
@@ -46,7 +50,10 @@ defmodule PoofWeb.ExpiryNoteComponents do
     ~H"""
     <div
       id={@id}
-      class="card border-base-200 border-2 rounded-md shadow-xl"
+      class={[
+        "card border-2 rounded-md shadow-xl",
+        if(@fresh?, do: "border-primary", else: "border-base-200")
+      ]}
     >
       <div class="card-body p-4">
         <p class="text-lg">{@expiry_note.body}</p>
