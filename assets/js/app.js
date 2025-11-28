@@ -27,6 +27,7 @@ import topbar from "../vendor/topbar";
 import { LocalTimeHook } from "./hooks/LocalTimeHook";
 import { LocalTimezoneHook } from "./hooks/LocalTimezoneHook";
 import { LocalDateTimeInputHook } from "./hooks/LocalDateTimeInputHook";
+import { CtrlEnterSubmitHook } from "./hooks/CtrlEnterSubmitHook";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -42,6 +43,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
     LocalTime: LocalTimeHook(),
     LocalTimezone: LocalTimezoneHook(),
     LocalDateTimeInput: LocalDateTimeInputHook(),
+    CtrlEnterSubmit: CtrlEnterSubmitHook(),
     ...colocatedHooks,
   },
 });

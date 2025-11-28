@@ -48,6 +48,12 @@ defmodule PoofWeb do
     end
   end
 
+  def component do
+    quote do
+      unquote(html())
+    end
+  end
+
   def live_view do
     quote do
       use Phoenix.LiveView

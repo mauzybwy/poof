@@ -2,6 +2,7 @@ defmodule PoofWeb.HomeLive do
   use PoofWeb, :live_view
 
   alias Poof.ExpiryNotes
+  alias PoofWeb.ExpiryNoteComponents
 
   # ================================================================================================
   # Render
@@ -20,30 +21,14 @@ defmodule PoofWeb.HomeLive do
         </:actions>
       </.header>
 
-      <.table
-        id="expiry_notes"
-        rows={@streams.expiry_notes}
-        row_click={fn {_id, expiry_note} -> JS.navigate(~p"/expiry_notes/#{expiry_note}") end}
-      >
-        <:col :let={{_id, expiry_note}} label={~H"<.icon name=\"hero-clock\" />"} class="w-36">
-          {Timex.format!(expiry_note.expiration, "{relative}", :relative)}
-        </:col>
-        <:col :let={{_id, expiry_note}} label="Body">{expiry_note.body}</:col>
-        <:action :let={{_id, expiry_note}}>
-          <div class="sr-only">
-            <.link navigate={~p"/expiry_notes/#{expiry_note}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/expiry_notes/#{expiry_note}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, expiry_note}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: expiry_note.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
-        </:action>
-      </.table>
+      <div id="expiry_notes" class="space-y-2">
+        <ExpiryNoteComponents.expiry_note
+          :for={expiry_note <- @expiry_notes}
+          id={"expiry_note-#{expiry_note.id}"}
+          expiry_note={expiry_note}
+          editing?={expiry_note.id == @editing_id}
+        />
+      </div>
     </Layouts.app>
     """
   end
@@ -59,21 +44,16 @@ defmodule PoofWeb.HomeLive do
   @impl true
   def mount(_params, session, socket) do
     if socket.assigns.current_scope do
-      timezone =
-        case Phoenix.LiveView.get_connect_params(socket) do
-          %{"timezone" => tz} -> tz
-          # Fallback to a default or session value
-          _ -> session["timezone"] || "UTC"
-        end
-
       if connected?(socket) do
         ExpiryNotes.subscribe_expiry_notes(socket.assigns.current_scope)
       end
 
       {:ok,
        socket
-       |> assign(timezone: timezone)
-       |> stream(:expiry_notes, ExpiryNotes.list_expiry_notes(socket.assigns.current_scope))}
+       |> assign(
+         editing_id: nil,
+         expiry_notes: ExpiryNotes.list_expiry_notes(socket.assigns.current_scope)
+       )}
     else
       {:ok, redirect(socket, to: ~p"/users/log-in")}
     end
@@ -88,6 +68,24 @@ defmodule PoofWeb.HomeLive do
     expiry_note = ExpiryNotes.get_expiry_note!(socket.assigns.current_scope, id)
     {:ok, _} = ExpiryNotes.delete_expiry_note(socket.assigns.current_scope, expiry_note)
 
-    {:noreply, stream_delete(socket, :expiry_notes, expiry_note)}
+    {:noreply,
+     assign(socket,
+       expiry_notes: ExpiryNotes.list_expiry_notes(socket.assigns.current_scope)
+     )}
+  end
+
+  @impl true
+  def handle_event("edit", %{"expiry_note_id" => expiry_note_id}, socket) do
+    {:noreply, assign(socket, editing_id: String.to_integer(expiry_note_id))}
+  end
+
+  @impl true
+  def handle_event("edit-cancel", _params, socket) do
+    {:noreply, assign(socket, editing_id: nil)}
+  end
+
+  @impl true
+  def handle_event("edit-save", _params, socket) do
+    {:noreply, assign(socket, editing_id: nil)}
   end
 end
