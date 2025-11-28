@@ -26,7 +26,7 @@ defmodule PoofWeb.HomeLive do
         row_click={fn {_id, expiry_note} -> JS.navigate(~p"/expiry_notes/#{expiry_note}") end}
       >
         <:col :let={{_id, expiry_note}} label={~H"<.icon name=\"hero-clock\" />"} class="w-36">
-          {localize_and_humanize_datetime(expiry_note.expiration, @timezone)}
+          {Timex.format!(expiry_note.expiration, "{relative}", :relative)}
         </:col>
         <:col :let={{_id, expiry_note}} label="Body">{expiry_note.body}</:col>
         <:action :let={{_id, expiry_note}}>
@@ -79,15 +79,15 @@ defmodule PoofWeb.HomeLive do
     end
   end
 
-  # ================================================================================================
-  # Private Functions
-  # ================================================================================================
+  # ------------------------------------------------------------------------------------------------
+  # Events
+  # ------------------------------------------------------------------------------------------------
 
-  defp localize_and_humanize_datetime(%DateTime{} = datetime, timezone) do
-    # datetime
-    # |> DateTime.shift_zone!(timezone, Tzdata.TimeZoneDatabase)
-    # |> IO.inspect()
-    datetime
-    |> Timex.format!("{relative}", :relative)
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    expiry_note = ExpiryNotes.get_expiry_note!(socket.assigns.current_scope, id)
+    {:ok, _} = ExpiryNotes.delete_expiry_note(socket.assigns.current_scope, expiry_note)
+
+    {:noreply, stream_delete(socket, :expiry_notes, expiry_note)}
   end
 end
