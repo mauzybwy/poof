@@ -28,6 +28,7 @@ import { LocalTimeHook } from "./hooks/LocalTimeHook";
 import { LocalTimezoneHook } from "./hooks/LocalTimezoneHook";
 import { LocalDateTimeInputHook } from "./hooks/LocalDateTimeInputHook";
 import { CtrlEnterSubmitHook } from "./hooks/CtrlEnterSubmitHook";
+import { ForcedAutofocusHook } from "./hooks/ForcedAutofocusHook";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -44,6 +45,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
     LocalTimezone: LocalTimezoneHook(),
     LocalDateTimeInput: LocalDateTimeInputHook(),
     CtrlEnterSubmit: CtrlEnterSubmitHook(),
+    ForcedAutofocus: ForcedAutofocusHook(),
     ...colocatedHooks,
   },
 });

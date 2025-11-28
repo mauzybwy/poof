@@ -24,11 +24,13 @@ defmodule PoofWeb.ExpiryNoteComponents do
         phx-hook="CtrlEnterSubmit"
       >
         <.input
+          id="#{id}-textarea"
           type="textarea"
           name="body"
           value={@expiry_note.body}
-          autofocus
           rows={5}
+          autofocus={true}
+          autofocus_to={:end}
         />
 
         <div class="card-actions justify-end">

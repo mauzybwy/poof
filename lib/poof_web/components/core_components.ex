@@ -162,6 +162,8 @@ defmodule PoofWeb.CoreComponents do
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
   attr :class, :string, default: nil, doc: "the input class to use over defaults"
   attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
+  attr :autofocus, :boolean, default: false, doc: "autofocus?"
+  attr :autofocus_to, :atom, values: [:start, :end], default: :start, doc: "where to autofocus"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
@@ -234,6 +236,8 @@ defmodule PoofWeb.CoreComponents do
         <textarea
           id={@id}
           name={@name}
+          phx-hook={@autofocus && "ForcedAutofocus"}
+          data-autofocus_to={@autofocus_to}
           class={[
             @class || "w-full textarea",
             @errors != [] && (@error_class || "textarea-error")
